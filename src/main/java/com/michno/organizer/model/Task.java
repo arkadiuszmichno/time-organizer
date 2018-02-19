@@ -1,5 +1,6 @@
 package com.michno.organizer.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.michno.organizer.utilities.LocalDateDeserializer;
@@ -9,7 +10,7 @@ import javax.persistence.*;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "tasks")
+@Table(name = "task")
 public class Task {
 
     @Id
@@ -39,6 +40,10 @@ public class Task {
 
     @Column(name = "reached")
     private boolean reached;
+
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @JoinColumn(name="list_id")
+    private ToDoList list;
 
     public Task(){
 
@@ -106,6 +111,15 @@ public class Task {
 
     public void setReached(boolean reached) {
         this.reached = reached;
+    }
+
+    @JsonIgnore
+    public ToDoList getList() {
+        return list;
+    }
+
+    public void setList(ToDoList list) {
+        this.list = list;
     }
 
     @Override

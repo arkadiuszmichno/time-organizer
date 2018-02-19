@@ -1,18 +1,29 @@
 package com.michno.organizer.model;
 
 
+import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.List;
 
+@Entity
+@Table(name="list")
 public class ToDoList {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private int id;
 
+    @Column(name = "name")
     private String name;
 
-    private ArrayList<Task> tasks;
+    @OneToMany(mappedBy = "list",
+            cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    private List<Task> tasks;
 
-    public ToDoList(int id, String name) {
+    public ToDoList() {
+    }
 
-        this.id = id;
+    public ToDoList(String name) {
         this.name = name;
     }
 
@@ -32,11 +43,27 @@ public class ToDoList {
         this.name = name;
     }
 
-    public ArrayList<Task> getTasks() {
+    public List<Task> getTasks() {
         return tasks;
     }
 
-    public void setTasks(ArrayList<Task> tasks) {
+    public void setTasks(List<Task> tasks) {
         this.tasks = tasks;
+    }
+
+    public void addTask(Task task) {
+        if (tasks == null)
+            tasks = new ArrayList<>();
+        tasks.add(task);
+        task.setList(this);
+    }
+
+    @Override
+    public String toString() {
+        return "ToDoList{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", tasks=" + tasks +
+                '}';
     }
 }
