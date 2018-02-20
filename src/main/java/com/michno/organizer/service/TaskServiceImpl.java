@@ -23,8 +23,8 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public void createTask(Task task) {
-        taskDAO.createTask(task);
+    public Task createTask(Task task) {
+        return taskDAO.createTask(task);
     }
 
     @Override

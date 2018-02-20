@@ -1,15 +1,21 @@
 package com.michno.organizer.controller;
 
+import com.michno.organizer.errors.DuplicateToDoListException;
+import com.michno.organizer.errors.IncorrectInputDataException;
+import com.michno.organizer.errors.EntityNotFoundException;
 import com.michno.organizer.model.Task;
 import com.michno.organizer.model.ToDoList;
 import com.michno.organizer.service.ToDoListService;
-import com.sun.xml.internal.bind.v2.TODO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.persistence.criteria.CriteriaBuilder;
+import javax.validation.Valid;
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -19,7 +25,7 @@ public class ToDoListController {
     @Autowired
     ToDoListService toDoListService;
 
-   @RequestMapping(value = "/list/", method = RequestMethod.GET)
+    @RequestMapping(value = "/list/", method = RequestMethod.GET)
     public ResponseEntity<List<ToDoList>> getAllLists() {
         List<ToDoList> lists = toDoListService.getAllLists();
 
@@ -28,11 +34,11 @@ public class ToDoListController {
     }
 
     @RequestMapping(value = "/list/{id}", method = RequestMethod.GET)
-    public ResponseEntity<ToDoList> getList(@PathVariable("id") String id) {
+    public ToDoList getList(@PathVariable("id") String id) {
         ToDoList list = toDoListService.getList(Integer.parseInt(id));
 
-        if (list == null) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        return new ResponseEntity<>(list, HttpStatus.OK);
+        if (list == null) throw new EntityNotFoundException(ToDoList.class.getSimpleName(), Integer.parseInt(id));
+        return list;
     }
 
     @RequestMapping(value = "/list/{id}/task", method = RequestMethod.GET)
@@ -44,21 +50,38 @@ public class ToDoListController {
     }
 
     @RequestMapping(value = "/list/", method = RequestMethod.POST)
-    public ResponseEntity<ToDoList> addList(@RequestBody ToDoList list) {
-        toDoListService.createList(list);
-        return new ResponseEntity<ToDoList>(list, HttpStatus.OK);
+    public ResponseEntity<ToDoList> addList(@RequestBody @Valid ToDoList list, Errors errors, UriComponentsBuilder ucb) {
+        if (errors.hasErrors()) {
+            throw new IncorrectInputDataException(errors);
+        }
+        if (toDoListService.hasDuplicate(list.getName()))
+            throw new DuplicateToDoListException(list.getName());
+
+        ToDoList toDoList = toDoListService.createList(list);
+
+        HttpHeaders headers = new HttpHeaders();
+        URI locationUri = ucb.path("/list/")
+                .path(String.valueOf(toDoList.getId()))
+                .build()
+                .toUri();
+
+        headers.setLocation(locationUri);
+        return new ResponseEntity<>(list, headers, HttpStatus.CREATED);
     }
 
     @RequestMapping(value = "/list/{id}", method = RequestMethod.PUT)
-    public ResponseEntity<ToDoList> updateList(@RequestBody ToDoList list, @PathVariable String id) {
+    public ToDoList updateList(@RequestBody @Valid ToDoList list, Errors errors, @PathVariable String id) {
+        if (errors.hasErrors()) {
+            throw new IncorrectInputDataException(errors);
+        }
         toDoListService.updateList(Integer.parseInt(id), list);
-        return new ResponseEntity<>(list, HttpStatus.OK);
+        return list;
     }
 
     @RequestMapping(value = "/list/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity<Void> deleteList(@PathVariable int id) {
+    @ResponseStatus(HttpStatus.GONE)
+    public void deleteList(@PathVariable int id) {
         toDoListService.deleteList(id);
-        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }

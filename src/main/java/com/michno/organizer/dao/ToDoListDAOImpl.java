@@ -23,7 +23,7 @@ public class ToDoListDAOImpl implements ToDoListDAO {
     public List<ToDoList> findAllToDoLists() {
         Query query = entityManager.createQuery("select to from ToDoList to");
         List<ToDoList> lists = query.getResultList();
-        if(lists == null) return new ArrayList<>();
+        if (lists == null) return new ArrayList<>();
         return lists;
     }
 
@@ -35,8 +35,8 @@ public class ToDoListDAOImpl implements ToDoListDAO {
 
     @Override
     @Transactional
-    public void createList(ToDoList list) {
-        entityManager.merge(list);
+    public ToDoList createList(ToDoList list) {
+        return entityManager.merge(list);
     }
 
     @Override
@@ -51,5 +51,13 @@ public class ToDoListDAOImpl implements ToDoListDAO {
     @Transactional
     public void deleteList(int id) {
         entityManager.remove(findListById(id));
+    }
+
+    @Override
+    public List<ToDoList> findListByName(String name) {
+        Query query = entityManager.createQuery("select t from ToDoList t WHERE t.name= :listName ");
+        query.setParameter("listName", name);
+        List<ToDoList> lists = query.getResultList();
+        return lists;
     }
 }

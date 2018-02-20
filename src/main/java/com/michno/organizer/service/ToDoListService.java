@@ -10,10 +10,11 @@ public interface ToDoListService {
 
     ToDoList getList(int i);
 
-    void createList(ToDoList list);
+    ToDoList createList(ToDoList list);
 
     void updateList(int i, ToDoList list);
 
     void deleteList(int id);
 
+    boolean hasDuplicate(String name);
 }

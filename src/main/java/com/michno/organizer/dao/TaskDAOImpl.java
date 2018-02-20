@@ -35,8 +35,8 @@ public class TaskDAOImpl implements TaskDAO {
 
     @Override
     @Transactional
-    public void createTask(Task task) {
-        entityManager.merge(task);
+    public Task createTask(Task task) {
+        return entityManager.merge(task);
     }
 
     @Override

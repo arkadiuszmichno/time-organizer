@@ -2,17 +2,22 @@ package com.michno.organizer.model;
 
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name="list")
+@Table(name = "list")
 public class ToDoList {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int id;
 
+    @NotNull
+    @Size(min = 3)
     @Column(name = "name")
     private String name;
 

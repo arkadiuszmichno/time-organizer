@@ -7,6 +7,8 @@ import com.michno.organizer.utilities.LocalDateDeserializer;
 import com.michno.organizer.utilities.LocalDateSerializer;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 
 @Entity
@@ -18,6 +20,8 @@ public class Task {
     @Column(name = "id")
     private int id;
 
+    @NotNull
+    @Size(min = 3)
     @Column(name = "name")
     private String name;
 
@@ -39,15 +43,20 @@ public class Task {
     private LocalDate endDate;
 
     @Column(name = "reached")
-    private boolean reached;
+    private boolean reached = false;
 
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-    @JoinColumn(name="list_id")
+    @JoinColumn(name = "list_id")
     private ToDoList list;
 
-    public Task(){
+    public Task() {
 
     }
+
+    public Task(String name) {
+        this.name = name;
+    }
+
     public Task(String name, String description, String priority, LocalDate startDate, LocalDate endDate) {
         this.name = name;
         this.description = description;

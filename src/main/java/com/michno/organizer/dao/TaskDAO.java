@@ -10,7 +10,7 @@ public interface TaskDAO {
 
     Task findTaskById(int id);
 
-    void createTask(Task task);
+    Task createTask(Task task);
 
     void updateTask(int id, Task task);
 

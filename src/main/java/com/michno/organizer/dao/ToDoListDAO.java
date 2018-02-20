@@ -9,9 +9,11 @@ public interface ToDoListDAO {
 
     ToDoList findListById(int id);
 
-    void createList(ToDoList list);
+    ToDoList createList(ToDoList list);
 
     void updateList(int id, ToDoList list);
 
     void deleteList(int id);
+
+    List<ToDoList> findListByName(String name);
 }
