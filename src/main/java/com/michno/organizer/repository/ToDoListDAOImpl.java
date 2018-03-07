@@ -1,9 +1,8 @@
-package com.michno.organizer.dao;
+package com.michno.organizer.repository;
 
 import com.michno.organizer.model.ToDoList;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.CrossOrigin;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -12,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-@CrossOrigin("*")
 public class ToDoListDAOImpl implements ToDoListDAO {
 
     @PersistenceContext

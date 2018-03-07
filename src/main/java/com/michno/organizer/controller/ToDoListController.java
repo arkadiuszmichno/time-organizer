@@ -1,8 +1,8 @@
 package com.michno.organizer.controller;
 
-import com.michno.organizer.errors.DuplicateToDoListException;
-import com.michno.organizer.errors.IncorrectInputDataException;
-import com.michno.organizer.errors.EntityNotFoundException;
+import com.michno.organizer.exception.DuplicateToDoListException;
+import com.michno.organizer.exception.IncorrectInputDataException;
+import com.michno.organizer.exception.EntityNotFoundException;
 import com.michno.organizer.model.Task;
 import com.michno.organizer.model.ToDoList;
 import com.michno.organizer.service.ToDoListService;
@@ -19,7 +19,6 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@CrossOrigin("*")
 public class ToDoListController {
 
     @Autowired

@@ -1,8 +1,7 @@
-package com.michno.organizer.dao;
+package com.michno.organizer.repository;
 
 import com.michno.organizer.model.Task;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.bind.annotation.CrossOrigin;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -12,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-@CrossOrigin("*")
 public class TaskDAOImpl implements TaskDAO {
 
     @PersistenceContext

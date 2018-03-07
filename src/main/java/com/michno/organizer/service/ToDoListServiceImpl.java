@@ -1,9 +1,8 @@
 package com.michno.organizer.service;
 
 
-import com.michno.organizer.dao.ToDoListDAO;
+import com.michno.organizer.repository.ToDoListDAO;
 import com.michno.organizer.model.ToDoList;
-import com.sun.xml.internal.bind.v2.TODO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

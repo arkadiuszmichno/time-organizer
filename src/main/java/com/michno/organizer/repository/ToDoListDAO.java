@@ -1,4 +1,4 @@
-package com.michno.organizer.dao;
+package com.michno.organizer.repository;
 
 import com.michno.organizer.model.ToDoList;
 

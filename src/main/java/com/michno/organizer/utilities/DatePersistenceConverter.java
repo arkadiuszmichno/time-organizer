@@ -17,14 +17,14 @@ public class DatePersistenceConverter implements AttributeConverter<LocalDate, D
         if (attribute != null) {
             Date date = valueOf(attribute);                                     //null check!!
             return date;
-        }
-        else return null;
+        } else return null;
     }
 
     @Override
     public LocalDate convertToEntityAttribute(Date dbData) {
-        return dbData.toLocalDate();
-
+        if (dbData != null)
+            return dbData.toLocalDate();
+        else return null;
         // return LocalDate date = LocalDate.ofInstant(input.toInstant(), ZoneId.systemDefault());; -- Java9
     }
 }

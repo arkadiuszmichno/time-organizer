@@ -1,4 +1,4 @@
-package com.michno.organizer.errors;
+package com.michno.organizer.exception;
 
 
 import org.springframework.validation.Errors;

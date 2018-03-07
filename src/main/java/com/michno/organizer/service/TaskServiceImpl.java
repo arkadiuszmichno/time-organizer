@@ -1,6 +1,6 @@
 package com.michno.organizer.service;
 
-import com.michno.organizer.dao.TaskDAO;
+import com.michno.organizer.repository.TaskDAO;
 import com.michno.organizer.model.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -1,7 +1,7 @@
 package com.michno.organizer.controller;
 
-import com.michno.organizer.errors.EntityNotFoundException;
-import com.michno.organizer.errors.IncorrectInputDataException;
+import com.michno.organizer.exception.EntityNotFoundException;
+import com.michno.organizer.exception.IncorrectInputDataException;
 import com.michno.organizer.model.Task;
 import com.michno.organizer.model.ToDoList;
 import com.michno.organizer.service.TaskService;
@@ -14,13 +14,11 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 
 @RestController
-@CrossOrigin("*")
 public class TaskController {
 
     @Autowired
@@ -63,7 +61,8 @@ public class TaskController {
                 .toUri();
         headers.setLocation(locationURI);
 
-        return new ResponseEntity<>(task, headers, HttpStatus.CREATED);
+
+        return new ResponseEntity<>(newTask, headers, HttpStatus.CREATED);
     }
 
     @RequestMapping(value = "/task/{id}", method = RequestMethod.PUT)
@@ -75,8 +74,7 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/task/{id}", method = RequestMethod.DELETE)
-    @ResponseStatus(HttpStatus.GONE)
-    public void deleteTask(@PathVariable int id) {
-        taskService.deleteTask(id);
+    public void deleteTask(@PathVariable String id) {
+        taskService.deleteTask(Integer.parseInt(id));
     }
 }
