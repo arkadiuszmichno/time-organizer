@@ -1,6 +1,9 @@
 package com.michno.organizer.model;
 
 
+import com.michno.organizer.model.audit.UserDateAudit;
+import org.hibernate.validator.constraints.NotBlank;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -8,15 +11,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "list")
-public class ToDoList {
+@Table(name = "lists")
+public class TodoList extends UserDateAudit {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private int id;
+    private Long id;
 
-    @NotNull
+    @NotBlank
     @Size(min = 3)
     @Column(name = "name")
     private String name;
@@ -25,18 +28,18 @@ public class ToDoList {
             cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private List<Task> tasks;
 
-    public ToDoList() {
+    public TodoList() {
     }
 
-    public ToDoList(String name) {
+    public TodoList(String name) {
         this.name = name;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -65,7 +68,7 @@ public class ToDoList {
 
     @Override
     public String toString() {
-        return "ToDoList{" +
+        return "TodoList{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", tasks=" + tasks +

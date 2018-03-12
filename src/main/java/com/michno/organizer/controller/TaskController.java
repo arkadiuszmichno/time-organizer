@@ -1,56 +1,59 @@
 package com.michno.organizer.controller;
 
-import com.michno.organizer.exception.EntityNotFoundException;
 import com.michno.organizer.exception.IncorrectInputDataException;
+import com.michno.organizer.exception.ResourceNotFoundException;
 import com.michno.organizer.model.Task;
-import com.michno.organizer.model.ToDoList;
-import com.michno.organizer.service.TaskService;
-import com.michno.organizer.service.ToDoListService;
+import com.michno.organizer.model.TodoList;
+import com.michno.organizer.payload.ApiResponse;
+import com.michno.organizer.payload.TaskResponse;
+import com.michno.organizer.repository.TaskRepository;
+import com.michno.organizer.repository.TodoListRepository;
+import com.michno.organizer.repository.UserRepository;
+import com.michno.organizer.security.CurrentUser;
+import com.michno.organizer.security.UserPrincipal;
+import com.michno.organizer.util.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.List;
 
 @RestController
 public class TaskController {
 
     @Autowired
-    TaskService taskService;
+    TodoListRepository todoListRepository;
 
     @Autowired
-    ToDoListService toDoListService;
+    TaskRepository taskRepository;
 
-    @RequestMapping(value = "/task/", method = RequestMethod.GET)
-    public ResponseEntity<List<Task>> getAllTasks() {
-        List<Task> tasks = taskService.getAllTasks();
+    @Autowired
+    UserRepository userRepository;
 
-        if (tasks.isEmpty()) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        return new ResponseEntity<>(tasks, HttpStatus.OK);
+    @GetMapping(value = "/task/{id}")
+    @PreAuthorize("hasRole('USER')")
+    public TaskResponse getTask(@PathVariable("id") Long id, @CurrentUser UserPrincipal currentUser) {
+        Task task = taskRepository.getOne(id);
+        if (task == null || task.getCreatedBy() != currentUser.getId())
+            throw new ResourceNotFoundException("Task", "id", id);
+
+        return ModelMapper.mapTaskToTaskResponse(task);
     }
 
-    @RequestMapping(value = "/task/{id}", method = RequestMethod.GET)
-    public Task getTask(@PathVariable("id") String id) {
-        Task task = taskService.getTask(Integer.parseInt(id));
-
-        if (task == null) throw new EntityNotFoundException(Task.class.getSimpleName(), Integer.parseInt(id));
-        return task;
-    }
-
-    @RequestMapping(value = "/list/{listId}/task/", method = RequestMethod.POST)
-    public ResponseEntity<Task> addTask(@PathVariable("listId") String id, @RequestBody @Valid Task task, Errors errors, UriComponentsBuilder ucb) {
+    @PostMapping(value = "/list/{listId}/task/")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> addTask(@PathVariable("listId") Long id, @RequestBody @Valid Task task, Errors errors, UriComponentsBuilder ucb) {
         if (errors.hasErrors())
             throw new IncorrectInputDataException(errors);
 
-        ToDoList list = toDoListService.getList(Integer.parseInt(id));
+        TodoList list = todoListRepository.findOne(id);
         list.addTask(task);
-        Task newTask = taskService.createTask(task);
+        Task newTask = taskRepository.save(task);
 
         HttpHeaders headers = new HttpHeaders();
         URI locationURI = ucb.path("/list/")
@@ -62,19 +65,26 @@ public class TaskController {
         headers.setLocation(locationURI);
 
 
-        return new ResponseEntity<>(newTask, headers, HttpStatus.CREATED);
+        return ResponseEntity.created(locationURI).body(new ApiResponse(true, "Task created successfully"));
     }
 
-    @RequestMapping(value = "/task/{id}", method = RequestMethod.PUT)
-    public Task updateTask(@RequestBody @Valid Task task, Errors errors, @PathVariable String id) {
+    @PutMapping(value = "/task/{id}")
+    @PreAuthorize("hasRole('USER')")
+    public TaskResponse updateTask(@RequestBody @Valid Task task, Errors errors, @PathVariable Long id, @CurrentUser UserPrincipal currentUser) {
         if (errors.hasErrors()) throw new IncorrectInputDataException(errors);
+        if (task.getCreatedBy() != currentUser.getId())
+            throw new ResourceNotFoundException("Task", "id", id);
 
-        taskService.updateTask(Integer.parseInt(id), task);
-        return task;
+        taskRepository.save(task);
+        return ModelMapper.mapTaskToTaskResponse(task);
     }
 
-    @RequestMapping(value = "/task/{id}", method = RequestMethod.DELETE)
-    public void deleteTask(@PathVariable String id) {
-        taskService.deleteTask(Integer.parseInt(id));
+    @DeleteMapping(value = "/task/{id}")
+    @PreAuthorize("hasRole('USER')")
+    public void deleteTask(@PathVariable Long id, @CurrentUser UserPrincipal currentUser) {
+        Task task = taskRepository.findOne(id);
+        if (task.getCreatedBy() != currentUser.getId())
+            throw new ResourceNotFoundException("Task", "id", id);
+        taskRepository.delete(id);
     }
 }

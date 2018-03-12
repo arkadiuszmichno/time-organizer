@@ -1,4 +1,4 @@
-package com.michno.organizer.utilities;
+package com.michno.organizer.util;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;

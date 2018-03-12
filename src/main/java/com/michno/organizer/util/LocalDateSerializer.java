@@ -1,4 +1,4 @@
-package com.michno.organizer.utilities;
+package com.michno.organizer.util;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;

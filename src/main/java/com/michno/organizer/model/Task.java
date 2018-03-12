@@ -1,26 +1,23 @@
 package com.michno.organizer.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.michno.organizer.utilities.LocalDateDeserializer;
-import com.michno.organizer.utilities.LocalDateSerializer;
+import com.michno.organizer.model.audit.UserDateAudit;
+import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.time.LocalDate;
+import java.time.Instant;
 
 @Entity
-@Table(name = "task")
-public class Task {
+@Table(name = "tasks")
+public class Task extends UserDateAudit{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private int id;
+    private Long id;
 
-    @NotNull
+    @NotBlank
     @Size(min = 3)
     @Column(name = "name")
     private String name;
@@ -32,22 +29,22 @@ public class Task {
     @Column(name = "description")
     private String description;
 
-    @JsonDeserialize(using = LocalDateDeserializer.class)
-    @JsonSerialize(using = LocalDateSerializer.class)
-    @Column(name = "start_date")
-    private LocalDate startDate;
+    //@JsonDeserialize(using = LocalDateDeserializer.class)
+   // @JsonSerialize(using = LocalDateSerializer.class)
+    //@Column(name = "start_date")
+   // private Instant startDate;
 
-    @JsonDeserialize(using = LocalDateDeserializer.class)
-    @JsonSerialize(using = LocalDateSerializer.class)
+   // @JsonDeserialize(using = LocalDateDeserializer.class)
+   // @JsonSerialize(using = LocalDateSerializer.class)
     @Column(name = "end_date")
-    private LocalDate endDate;
+    private Instant endDate;
 
     @Column(name = "reached")
-    private boolean reached = false;
+    private Boolean reached = false;
 
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinColumn(name = "list_id")
-    private ToDoList list;
+    private TodoList list;
 
     public Task() {
 
@@ -57,20 +54,20 @@ public class Task {
         this.name = name;
     }
 
-    public Task(String name, String description, String priority, LocalDate startDate, LocalDate endDate) {
+    public Task(String name, String description, String priority, Instant startDate, Instant endDate) {
         this.name = name;
         this.description = description;
         this.priority = priority;
-        this.startDate = startDate;
+       // this.startDate = startDate;
         this.endDate = endDate;
         this.reached = false;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -98,19 +95,19 @@ public class Task {
         this.priority = priority;
     }
 
-    public LocalDate getStartDate() {
-        return startDate;
-    }
+   // public Instant getStartDate() {
+   //     return startDate;
+   // }
 
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
-    }
+  //  public void setStartDate(Instant startDate) {
+       // this.startDate = startDate;
+   // }
 
-    public LocalDate getEndDate() {
+    public Instant getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(LocalDate endDate) {
+    public void setEndDate(Instant endDate) {
         this.endDate = endDate;
     }
 
@@ -123,11 +120,11 @@ public class Task {
     }
 
     @JsonIgnore
-    public ToDoList getList() {
+    public TodoList getList() {
         return list;
     }
 
-    public void setList(ToDoList list) {
+    public void setList(TodoList list) {
         this.list = list;
     }
 
@@ -138,7 +135,7 @@ public class Task {
                 ", name='" + name + '\'' +
                 ", priority='" + priority + '\'' +
                 ", description='" + description + '\'' +
-                ", startDate=" + startDate +
+               // ", startDate=" + startDate +
                 ", endDate=" + endDate +
                 ", reached=" + reached +
                 '}';

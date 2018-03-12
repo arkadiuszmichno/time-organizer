@@ -2,14 +2,23 @@ package com.michno.organizer.controller;
 
 import com.michno.organizer.exception.DuplicateToDoListException;
 import com.michno.organizer.exception.IncorrectInputDataException;
-import com.michno.organizer.exception.EntityNotFoundException;
-import com.michno.organizer.model.Task;
-import com.michno.organizer.model.ToDoList;
+import com.michno.organizer.exception.ResourceNotFoundException;
+import com.michno.organizer.model.TodoList;
+import com.michno.organizer.model.User;
+import com.michno.organizer.payload.ApiResponse;
+import com.michno.organizer.payload.TaskResponse;
+import com.michno.organizer.payload.TodoListRequest;
+import com.michno.organizer.payload.TodoListResponse;
+import com.michno.organizer.repository.TodoListRepository;
+import com.michno.organizer.repository.UserRepository;
+import com.michno.organizer.security.CurrentUser;
+import com.michno.organizer.security.UserPrincipal;
 import com.michno.organizer.service.ToDoListService;
+import com.michno.organizer.util.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -19,68 +28,84 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
+@RequestMapping("/lists")
 public class ToDoListController {
 
     @Autowired
     ToDoListService toDoListService;
 
-    @RequestMapping(value = "/list/", method = RequestMethod.GET)
-    public ResponseEntity<List<ToDoList>> getAllLists() {
-        List<ToDoList> lists = toDoListService.getAllLists();
+    @Autowired
+    TodoListRepository todoListRepository;
 
-        if (lists == null) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        return new ResponseEntity<>(lists, HttpStatus.OK);
+    @Autowired
+    UserRepository userRepository;
+
+
+    @GetMapping("/user/{username}")
+    @PreAuthorize("hasRole('USER')")
+    public List<TodoListResponse> getListsCreatedBy(@PathVariable String username, @CurrentUser UserPrincipal currentUser) {
+        return toDoListService.getListsCreatedBy(username, currentUser);
     }
 
-    @RequestMapping(value = "/list/{id}", method = RequestMethod.GET)
-    public ToDoList getList(@PathVariable("id") String id) {
-        ToDoList list = toDoListService.getList(Integer.parseInt(id));
-
-        if (list == null) throw new EntityNotFoundException(ToDoList.class.getSimpleName(), Integer.parseInt(id));
-        return list;
+    @GetMapping(value = "/{id}")
+    @PreAuthorize("hasRole('USER')")
+    public TodoListResponse getListById(@CurrentUser UserPrincipal currentUser, @PathVariable("id") Long todoListId) {
+        TodoList list = todoListRepository.findTodoListById(todoListId).orElseThrow(() -> new ResourceNotFoundException("TodoList", "id", todoListId));
+        if (currentUser != null && list.getCreatedBy() != currentUser.getId()) {
+            throw new ResourceNotFoundException("TodoList", "id", todoListId);
+        }
+        User user = userRepository.findById(list.getCreatedBy())
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", list.getCreatedBy()));
+        return ModelMapper.mapTodoListToTodoListResponse(list, user);
     }
 
-    @RequestMapping(value = "/list/{id}/task", method = RequestMethod.GET)
-    public ResponseEntity<List<Task>> getTasks(@PathVariable("id") String id) {
-        ToDoList list = toDoListService.getList(Integer.parseInt(id));
-        List<Task> tasks = list.getTasks();
-        if (list == null || tasks == null) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        return new ResponseEntity<>(tasks, HttpStatus.OK);
+    @GetMapping(value = "/{id}/tasks")
+    @PreAuthorize("hasRole('USER')")
+    public List<TaskResponse> getTasks(@PathVariable("id") Long id, @CurrentUser UserPrincipal currentUser) {
+        TodoList list = todoListRepository.findOne(id);
+        User user = userRepository.findByUsername(currentUser.getUsername()).orElseThrow(() -> new ResourceNotFoundException("User", "username", currentUser.getUsername()));
+        TodoListResponse todoListResponse = ModelMapper.mapTodoListToTodoListResponse(list, user);
+        return todoListResponse.getTasks();
     }
 
-    @RequestMapping(value = "/list/", method = RequestMethod.POST)
-    public ResponseEntity<ToDoList> addList(@RequestBody @Valid ToDoList list, Errors errors, UriComponentsBuilder ucb) {
+    @PostMapping
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> addList(@RequestBody @Valid TodoListRequest list, Errors errors, UriComponentsBuilder ucb) {
         if (errors.hasErrors()) {
             throw new IncorrectInputDataException(errors);
         }
         if (toDoListService.hasDuplicate(list.getName()))
             throw new DuplicateToDoListException(list.getName());
 
-        ToDoList toDoList = toDoListService.createList(list);
+        TodoList todoList = new TodoList();
+        todoList.setName(list.getName());
 
-        HttpHeaders headers = new HttpHeaders();
+        TodoList todoResult = todoListRepository.save(todoList);
+
         URI locationUri = ucb.path("/list/")
-                .path(String.valueOf(toDoList.getId()))
+                .path(String.valueOf(todoResult.getId()))
                 .build()
                 .toUri();
 
-        headers.setLocation(locationUri);
-        return new ResponseEntity<>(list, headers, HttpStatus.CREATED);
+
+        return ResponseEntity.created(locationUri).body(new ApiResponse(true, "TodoList Created Successfully"));
     }
 
-    @RequestMapping(value = "/list/{id}", method = RequestMethod.PUT)
-    public ToDoList updateList(@RequestBody @Valid ToDoList list, Errors errors, @PathVariable String id) {
+    @PutMapping(value = "/{id}")
+    @PreAuthorize("hasRole('USER')")
+    public TodoListResponse updateList(@RequestBody @Valid TodoList list, Errors errors, @PathVariable Long id, @CurrentUser UserPrincipal currentUser) {
         if (errors.hasErrors()) {
             throw new IncorrectInputDataException(errors);
         }
-        toDoListService.updateList(Integer.parseInt(id), list);
-        return list;
+        todoListRepository.save(list);
+        User user = userRepository.findByUsername(currentUser.getUsername()).orElseThrow(() -> new ResourceNotFoundException("User", "username", currentUser.getUsername()));
+        return ModelMapper.mapTodoListToTodoListResponse(list, user);
     }
 
-    @RequestMapping(value = "/list/{id}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.GONE)
-    public void deleteList(@PathVariable int id) {
-        toDoListService.deleteList(id);
+    public void deleteList(@PathVariable Long id) {
+        todoListRepository.delete(id);
     }
 
 }

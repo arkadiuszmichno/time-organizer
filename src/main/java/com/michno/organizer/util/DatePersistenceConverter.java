@@ -1,10 +1,9 @@
-package com.michno.organizer.utilities;
+package com.michno.organizer.util;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 import java.sql.Date;
 import java.time.LocalDate;
-import java.time.ZoneId;
 
 import static java.sql.Date.valueOf;
 

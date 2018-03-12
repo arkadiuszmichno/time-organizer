@@ -1,48 +1,52 @@
 package com.michno.organizer.service;
 
 
-import com.michno.organizer.repository.ToDoListDAO;
-import com.michno.organizer.model.ToDoList;
+import com.michno.organizer.exception.ResourceNotFoundException;
+import com.michno.organizer.model.TodoList;
+import com.michno.organizer.model.User;
+import com.michno.organizer.payload.TodoListResponse;
+import com.michno.organizer.repository.TodoListRepository;
+import com.michno.organizer.repository.UserRepository;
+import com.michno.organizer.security.UserPrincipal;
+import com.michno.organizer.util.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ToDoListServiceImpl implements ToDoListService {
 
     @Autowired
-    private ToDoListDAO toDoListDAO;
+    private UserRepository userRepository;
+
+    @Autowired
+    private TodoListRepository todoListRepository;
 
     @Override
-    public List<ToDoList> getAllLists() {
-        return toDoListDAO.findAllToDoLists();
-    }
+    public List<TodoListResponse> getListsCreatedBy(String username, UserPrincipal currentUser) {
 
-    @Override
-    public ToDoList getList(int id) {
-        return toDoListDAO.findListById(id);
-    }
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
+        List<TodoList> todoLists = todoListRepository.findByCreatedBy(user.getId());
 
-    @Override
-    public ToDoList createList(ToDoList list) {
-        return toDoListDAO.createList(list);
-    }
+        if (todoLists.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<TodoListResponse> todoListResponses = todoLists.stream().map(todoList -> ModelMapper.mapTodoListToTodoListResponse(todoList,
+                user)).collect(Collectors.toList());
 
-    @Override
-    public void updateList(int id, ToDoList list) {
-        toDoListDAO.updateList(id, list);
-    }
-
-    @Override
-    public void deleteList(int id) {
-        toDoListDAO.deleteList(id);
+        return todoListResponses;
     }
 
     @Override
     public boolean hasDuplicate(String name) {
-        List<ToDoList> lists = toDoListDAO.findListByName(name);
-        if (lists.size() == 0) return false;
-        return true;
+        Optional<TodoList> list = todoListRepository.findTodoListByName(name);
+        if (list.isPresent()) return true;
+        else
+            return false;
     }
 }

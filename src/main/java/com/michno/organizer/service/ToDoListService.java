@@ -1,20 +1,13 @@
 package com.michno.organizer.service;
 
-import com.michno.organizer.model.ToDoList;
-import org.springframework.stereotype.Service;
+import com.michno.organizer.model.TodoList;
+import com.michno.organizer.payload.TodoListResponse;
+import com.michno.organizer.security.UserPrincipal;
 
 import java.util.List;
 
 public interface ToDoListService {
-    List<ToDoList> getAllLists();
-
-    ToDoList getList(int i);
-
-    ToDoList createList(ToDoList list);
-
-    void updateList(int i, ToDoList list);
-
-    void deleteList(int id);
+    List<TodoListResponse> getListsCreatedBy(String username, UserPrincipal currentUser);
 
     boolean hasDuplicate(String name);
 }
