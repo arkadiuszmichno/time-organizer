@@ -1,0 +1,19 @@
+<main>
+  <div class="container">
+    <div class="row row-offcanvas row-offcanvas-right">
+      <div class="col-xs-12 col-sm-9">
+        <div class="jumbotron">
+          <section class="todoapp">
+            <app-task-list-header [todo]="todo" (add)="onAddTask($event)"></app-task-list-header>
+            <app-task-list [tasks]="tasks" (toggleComplete)="onToggleTaskComplete($event)"
+                           (remove)="onRemoveTask($event)"></app-task-list>
+            <app-task-list-footer [tasks]="tasks"></app-task-list-footer>
+          </section>
+        </div>
+        <router-outlet></router-outlet>
+      </div>
+      <router-outlet name="sidemenu"></router-outlet>
+    </div>
+  </div>
+</main>
+

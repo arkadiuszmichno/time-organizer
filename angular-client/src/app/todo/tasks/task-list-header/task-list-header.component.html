@@ -1,0 +1,7 @@
+<header class="header">
+  <h1>{{todo.name}}</h1>
+  <br />
+  <input class="form-control" placeholder="What needs to be done?" autofocus="" [(ngModel)]="newTask.name"
+         (keyup.enter)="addTask()">
+  <br />
+</header>

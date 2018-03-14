@@ -1,0 +1,7 @@
+<div class="view">
+  <input class="toggle" type="checkbox" (click)="toggleTaskComplete(task)" [checked]="task.complete">
+  <label>{{task.name}}</label>
+  <button type="button" class="destroy" (click)="removeTask(task)">
+  </button>
+
+</div>

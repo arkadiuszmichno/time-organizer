@@ -20,7 +20,7 @@ public class UserController {
 
     @Autowired
     UserRepository userRepository;
-    
+
 
     @GetMapping("/user/me")
     @PreAuthorize("hasRole('USER')")
