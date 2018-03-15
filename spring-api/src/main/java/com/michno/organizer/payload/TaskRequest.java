@@ -3,6 +3,7 @@ package com.michno.organizer.payload;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.Size;
+import java.time.Instant;
 import java.time.LocalDate;
 
 public class TaskRequest {
@@ -15,7 +16,7 @@ public class TaskRequest {
 
     private String description;
 
-    private LocalDate endDate;
+    private Instant endDate;
 
     public String getName() {
         return name;
@@ -41,11 +42,11 @@ public class TaskRequest {
         this.description = description;
     }
 
-    public LocalDate getEndDate() {
+    public Instant getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(LocalDate endDate) {
+    public void setEndDate(Instant endDate) {
         this.endDate = endDate;
     }
 }

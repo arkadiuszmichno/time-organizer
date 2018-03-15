@@ -28,10 +28,11 @@ class SpringSecurityAuditAwareImpl implements AuditorAware<Long> {
     public Long getCurrentAuditor() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-       // if (authentication == null || !authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
+        if (authentication == null || !authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
        //     return Optional.empty();
+            return null;
 
-       // }
+       }
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
 
       //  return Optional.ofNullable(userPrincipal.getId());

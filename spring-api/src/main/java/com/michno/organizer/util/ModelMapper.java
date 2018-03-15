@@ -4,6 +4,7 @@ package com.michno.organizer.util;
 import com.michno.organizer.model.Task;
 import com.michno.organizer.model.TodoList;
 import com.michno.organizer.model.User;
+import com.michno.organizer.payload.TaskRequest;
 import com.michno.organizer.payload.TaskResponse;
 import com.michno.organizer.payload.TodoListResponse;
 import com.michno.organizer.payload.UserSummary;
@@ -47,5 +48,16 @@ public class ModelMapper {
         taskResponse.setReached(task.isReached());
 
         return taskResponse;
+    }
+
+    public static Task mapTaskRequestToTask(TaskRequest taskRequest) {
+        Task task = new Task();
+        task.setName(taskRequest.getName());
+        task.setPriority(taskRequest.getPriority());
+        task.setDescription(taskRequest.getDescription());
+        task.setEndDate(taskRequest.getEndDate());
+        task.setReached(false);
+
+        return task;
     }
 }

@@ -16,7 +16,6 @@ import com.michno.organizer.security.UserPrincipal;
 import com.michno.organizer.service.ToDoListService;
 import com.michno.organizer.util.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.Errors;
@@ -40,10 +39,10 @@ public class ToDoListController {
     @Autowired
     UserRepository userRepository;
 
-
-    @GetMapping("/user/{username}")
+    @GetMapping
     @PreAuthorize("hasRole('USER')")
-    public List<TodoListResponse> getListsCreatedBy(@PathVariable String username, @CurrentUser UserPrincipal currentUser) {
+    public List<TodoListResponse> getListsCreatedBy(@CurrentUser UserPrincipal currentUser) {
+        String username = currentUser.getUsername();
         return toDoListService.getListsCreatedBy(username, currentUser);
     }
 
@@ -62,8 +61,13 @@ public class ToDoListController {
     @GetMapping(value = "/{id}/tasks")
     @PreAuthorize("hasRole('USER')")
     public List<TaskResponse> getTasks(@PathVariable("id") Long id, @CurrentUser UserPrincipal currentUser) {
-        TodoList list = todoListRepository.findOne(id);
+        TodoList list = todoListRepository.findTodoListById(id).orElseThrow(() -> new ResourceNotFoundException("To-do List", "id", id));
         User user = userRepository.findByUsername(currentUser.getUsername()).orElseThrow(() -> new ResourceNotFoundException("User", "username", currentUser.getUsername()));
+
+        if (list.getCreatedBy() != user.getId()) {
+            throw new ResourceNotFoundException("To-do list", "id", id);
+        }
+
         TodoListResponse todoListResponse = ModelMapper.mapTodoListToTodoListResponse(list, user);
         return todoListResponse.getTasks();
     }
@@ -93,19 +97,27 @@ public class ToDoListController {
 
     @PutMapping(value = "/{id}")
     @PreAuthorize("hasRole('USER')")
-    public TodoListResponse updateList(@RequestBody @Valid TodoList list, Errors errors, @PathVariable Long id, @CurrentUser UserPrincipal currentUser) {
+    public TodoListResponse updateList(@RequestBody @Valid TodoListRequest list, Errors errors, @PathVariable Long id, @CurrentUser UserPrincipal currentUser) {
         if (errors.hasErrors()) {
             throw new IncorrectInputDataException(errors);
         }
-        todoListRepository.save(list);
+
+        TodoList todoList = new TodoList();
+        todoList.setName(list.getName());
+
+        todoListRepository.save(todoList);
         User user = userRepository.findByUsername(currentUser.getUsername()).orElseThrow(() -> new ResourceNotFoundException("User", "username", currentUser.getUsername()));
-        return ModelMapper.mapTodoListToTodoListResponse(list, user);
+        return ModelMapper.mapTodoListToTodoListResponse(todoList, user);
     }
 
     @DeleteMapping(value = "/{id}")
-    @ResponseStatus(HttpStatus.GONE)
-    public void deleteList(@PathVariable Long id) {
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> deleteList(@PathVariable Long id, @CurrentUser UserPrincipal currentUser) {
+        if (todoListRepository.getOne(id).getCreatedBy() != currentUser.getId()) {
+            throw new ResourceNotFoundException("To-do List", "id", id);
+        }
         todoListRepository.delete(id);
+        return ResponseEntity.accepted().body(new ApiResponse(true, "TodoList deleted successfully"));
     }
 
 }

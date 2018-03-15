@@ -5,12 +5,14 @@ import com.michno.organizer.exception.ResourceNotFoundException;
 import com.michno.organizer.model.Task;
 import com.michno.organizer.model.TodoList;
 import com.michno.organizer.payload.ApiResponse;
+import com.michno.organizer.payload.TaskRequest;
 import com.michno.organizer.payload.TaskResponse;
 import com.michno.organizer.repository.TaskRepository;
 import com.michno.organizer.repository.TodoListRepository;
 import com.michno.organizer.repository.UserRepository;
 import com.michno.organizer.security.CurrentUser;
 import com.michno.organizer.security.UserPrincipal;
+import com.michno.organizer.service.TaskService;
 import com.michno.organizer.util.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -32,26 +34,27 @@ public class TaskController {
     @Autowired
     TaskRepository taskRepository;
 
+
     @Autowired
-    UserRepository userRepository;
+    TaskService taskService;
 
     @GetMapping(value = "/task/{id}")
     @PreAuthorize("hasRole('USER')")
     public TaskResponse getTask(@PathVariable("id") Long id, @CurrentUser UserPrincipal currentUser) {
-        Task task = taskRepository.getOne(id);
-        if (task == null || task.getCreatedBy() != currentUser.getId())
-            throw new ResourceNotFoundException("Task", "id", id);
+        Task task = taskRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Task", "id", id));
 
         return ModelMapper.mapTaskToTaskResponse(task);
     }
 
     @PostMapping(value = "/list/{listId}/task/")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<?> addTask(@PathVariable("listId") Long id, @RequestBody @Valid Task task, Errors errors, UriComponentsBuilder ucb) {
+    public ResponseEntity<?> addTask(@PathVariable("listId") Long id, @RequestBody @Valid TaskRequest taskRequest, Errors errors, UriComponentsBuilder ucb) {
         if (errors.hasErrors())
             throw new IncorrectInputDataException(errors);
 
-        TodoList list = todoListRepository.findOne(id);
+        TodoList list = todoListRepository.findTodoListById(id).orElseThrow(() -> new ResourceNotFoundException("To-do List", "id", id));
+
+        Task task = ModelMapper.mapTaskRequestToTask(taskRequest);
         list.addTask(task);
         Task newTask = taskRepository.save(task);
 
@@ -70,12 +73,14 @@ public class TaskController {
 
     @PutMapping(value = "/task/{id}")
     @PreAuthorize("hasRole('USER')")
-    public TaskResponse updateTask(@RequestBody @Valid Task task, Errors errors, @PathVariable Long id, @CurrentUser UserPrincipal currentUser) {
+    public TaskResponse updateTask(@RequestBody @Valid TaskRequest taskRequest, Errors errors, @PathVariable Long id, @CurrentUser UserPrincipal currentUser) {
         if (errors.hasErrors()) throw new IncorrectInputDataException(errors);
+        Task task = taskRepository.findByName(taskRequest.getName()).orElseThrow(() -> new ResourceNotFoundException("Task", "name", taskRequest.getName()));
+
         if (task.getCreatedBy() != currentUser.getId())
             throw new ResourceNotFoundException("Task", "id", id);
 
-        taskRepository.save(task);
+        taskService.save(task, taskRequest);
         return ModelMapper.mapTaskToTaskResponse(task);
     }
 

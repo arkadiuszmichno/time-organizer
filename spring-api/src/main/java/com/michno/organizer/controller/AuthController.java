@@ -1,15 +1,17 @@
 package com.michno.organizer.controller;
 
-import com.michno.organizer.repository.RoleRepository;
-import com.michno.organizer.repository.UserRepository;
 import com.michno.organizer.exception.AppException;
 import com.michno.organizer.model.Role;
 import com.michno.organizer.model.RoleName;
+import com.michno.organizer.model.TodoList;
 import com.michno.organizer.model.User;
 import com.michno.organizer.payload.ApiResponse;
 import com.michno.organizer.payload.JwtAuthenticationResponse;
 import com.michno.organizer.payload.LoginRequest;
 import com.michno.organizer.payload.SignUpRequest;
+import com.michno.organizer.repository.RoleRepository;
+import com.michno.organizer.repository.TodoListRepository;
+import com.michno.organizer.repository.UserRepository;
 import com.michno.organizer.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -48,6 +50,9 @@ public class AuthController {
     @Autowired
     JwtTokenProvider tokenProvider;
 
+    @Autowired
+    TodoListRepository todoListRepository;
+
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
@@ -84,6 +89,11 @@ public class AuthController {
         user.setRoles(Collections.singleton(userRole));
 
         User result = userRepository.save(user);
+
+
+        TodoList todayList = new TodoList("Today");
+        todayList.setCreatedBy(result.getId());
+        todoListRepository.save(todayList);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentContextPath().path("/users/{username}")

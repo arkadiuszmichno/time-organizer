@@ -3,7 +3,13 @@ package com.michno.organizer.repository;
 
 import com.michno.organizer.model.Task;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface TaskRepository extends JpaRepository<Task, Long>{
+import java.util.Optional;
 
+@Repository
+public interface TaskRepository extends JpaRepository<Task, Long> {
+    Optional<Task> findById(Long id);
+
+    Optional<Task> findByName(String name);
 }
