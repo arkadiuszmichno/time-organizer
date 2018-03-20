@@ -7,7 +7,6 @@ public class TodoListResponse {
     private Long id;
     private String name;
     private List<TaskResponse> tasks;
-    private UserSummary createdBy;
 
 
     public Long getId() {
@@ -34,12 +33,5 @@ public class TodoListResponse {
         this.tasks = tasks;
     }
 
-    public UserSummary getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(UserSummary createdBy) {
-        this.createdBy = createdBy;
-    }
 
 }

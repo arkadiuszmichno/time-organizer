@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ModelMapper {
-    public static TodoListResponse mapTodoListToTodoListResponse(TodoList todoList, User creator) {
+    public static TodoListResponse mapTodoListToTodoListResponse(TodoList todoList) {
         TodoListResponse todoListResponse = new TodoListResponse();
         todoListResponse.setId(todoList.getId());
         todoListResponse.setName(todoList.getName());
@@ -31,8 +31,6 @@ public class ModelMapper {
         }).collect(Collectors.toList());
 
         todoListResponse.setTasks(taskResponses);
-        UserSummary creatorSummary = new UserSummary(creator.getId(), creator.getUsername(), creator.getName());
-        todoListResponse.setCreatedBy(creatorSummary);
 
         return todoListResponse;
     }

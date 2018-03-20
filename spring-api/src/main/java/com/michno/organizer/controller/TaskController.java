@@ -3,13 +3,9 @@ package com.michno.organizer.controller;
 import com.michno.organizer.exception.IncorrectInputDataException;
 import com.michno.organizer.exception.ResourceNotFoundException;
 import com.michno.organizer.model.Task;
-import com.michno.organizer.model.TodoList;
 import com.michno.organizer.payload.ApiResponse;
 import com.michno.organizer.payload.TaskRequest;
 import com.michno.organizer.payload.TaskResponse;
-import com.michno.organizer.repository.TaskRepository;
-import com.michno.organizer.repository.TodoListRepository;
-import com.michno.organizer.repository.UserRepository;
 import com.michno.organizer.security.CurrentUser;
 import com.michno.organizer.security.UserPrincipal;
 import com.michno.organizer.service.TaskService;
@@ -29,38 +25,29 @@ import java.net.URI;
 public class TaskController {
 
     @Autowired
-    TodoListRepository todoListRepository;
-
-    @Autowired
-    TaskRepository taskRepository;
-
-
-    @Autowired
     TaskService taskService;
 
-    @GetMapping(value = "/task/{id}")
+    @GetMapping(value = "/tasks/{id}")
     @PreAuthorize("hasRole('USER')")
     public TaskResponse getTask(@PathVariable("id") Long id, @CurrentUser UserPrincipal currentUser) {
-        Task task = taskRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Task", "id", id));
+        Task task = taskService.findById(id, currentUser);
 
         return ModelMapper.mapTaskToTaskResponse(task);
     }
 
-    @PostMapping(value = "/list/{listId}/task/")
+    @PostMapping(value = "/lists/{listId}/tasks")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<?> addTask(@PathVariable("listId") Long id, @RequestBody @Valid TaskRequest taskRequest, Errors errors, UriComponentsBuilder ucb) {
+    public ResponseEntity<?> addTask(@PathVariable("listId") Long listId, @RequestBody @Valid TaskRequest taskRequest, Errors errors,
+                                     UriComponentsBuilder ucb, @CurrentUser UserPrincipal currentUser) {
         if (errors.hasErrors())
             throw new IncorrectInputDataException(errors);
 
-        TodoList list = todoListRepository.findTodoListById(id).orElseThrow(() -> new ResourceNotFoundException("To-do List", "id", id));
 
-        Task task = ModelMapper.mapTaskRequestToTask(taskRequest);
-        list.addTask(task);
-        Task newTask = taskRepository.save(task);
+        Task newTask = taskService.create(taskRequest, listId, currentUser);
 
         HttpHeaders headers = new HttpHeaders();
         URI locationURI = ucb.path("/list/")
-                .path(String.valueOf(list.getId()))
+                .path(String.valueOf(listId))
                 .path("/task")
                 .path(String.valueOf(newTask.getId()))
                 .build()
@@ -71,25 +58,18 @@ public class TaskController {
         return ResponseEntity.created(locationURI).body(new ApiResponse(true, "Task created successfully"));
     }
 
-    @PutMapping(value = "/task/{id}")
+    @PutMapping(value = "/tasks/{id}")
     @PreAuthorize("hasRole('USER')")
-    public TaskResponse updateTask(@RequestBody @Valid TaskRequest taskRequest, Errors errors, @PathVariable Long id, @CurrentUser UserPrincipal currentUser) {
+    public TaskResponse updateTask(@RequestBody @Valid TaskRequest taskRequest, Errors errors, @PathVariable Long taskId, @CurrentUser UserPrincipal currentUser) {
         if (errors.hasErrors()) throw new IncorrectInputDataException(errors);
-        Task task = taskRepository.findByName(taskRequest.getName()).orElseThrow(() -> new ResourceNotFoundException("Task", "name", taskRequest.getName()));
 
-        if (task.getCreatedBy() != currentUser.getId())
-            throw new ResourceNotFoundException("Task", "id", id);
-
-        taskService.save(task, taskRequest);
+        Task task = taskService.updateTask(taskId, taskRequest, currentUser);
         return ModelMapper.mapTaskToTaskResponse(task);
     }
 
-    @DeleteMapping(value = "/task/{id}")
+    @DeleteMapping(value = "/tasks/{id}")
     @PreAuthorize("hasRole('USER')")
     public void deleteTask(@PathVariable Long id, @CurrentUser UserPrincipal currentUser) {
-        Task task = taskRepository.findOne(id);
-        if (task.getCreatedBy() != currentUser.getId())
-            throw new ResourceNotFoundException("Task", "id", id);
-        taskRepository.delete(id);
+        taskService.deleteTask(id, currentUser);
     }
 }
