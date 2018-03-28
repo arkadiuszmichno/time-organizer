@@ -9,7 +9,7 @@ public class TaskResponse {
     private String description;
     private String priority;
     private Instant creationDateTime;
-    private Instant expirationDateTime;
+    private String endDate;
     private Boolean reached;
 
     public Long getId() {
@@ -52,12 +52,12 @@ public class TaskResponse {
         this.creationDateTime = creationDateTime;
     }
 
-    public Instant getExpirationDateTime() {
-        return expirationDateTime;
+    public String getEndDate() {
+        return endDate;
     }
 
-    public void setExpirationDateTime(Instant expirationDateTime) {
-        this.expirationDateTime = expirationDateTime;
+    public void setEndDate(String expirationDateTime) {
+        this.endDate = expirationDateTime;
     }
 
     public Boolean getReached() {

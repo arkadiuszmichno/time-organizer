@@ -22,6 +22,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/lists")
 public class ToDoListController {
 
@@ -55,12 +56,12 @@ public class ToDoListController {
 
     @PostMapping
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<?> addList(@RequestBody @Valid TodoListRequest list, Errors errors, UriComponentsBuilder ucb) {
+    public ResponseEntity<?> addList(@RequestBody @Valid TodoListRequest list, Errors errors, UriComponentsBuilder ucb, @CurrentUser UserPrincipal currentUser) {
         if (errors.hasErrors()) {
             throw new IncorrectInputDataException(errors);
         }
 
-        TodoList todoResult = todoListService.createTodoList(list);
+        TodoList todoResult = todoListService.createTodoList(list, currentUser);
 
         URI locationUri = ucb.path("/list/")
                 .path(String.valueOf(todoResult.getId()))

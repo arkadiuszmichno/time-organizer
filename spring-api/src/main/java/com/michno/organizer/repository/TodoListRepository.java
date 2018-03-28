@@ -14,6 +14,8 @@ public interface TodoListRepository extends JpaRepository<TodoList, Long> {
 
     Optional<TodoList> findTodoListByName(String name);
 
+    Optional<TodoList> findTodoListByNameAndCreatedBy(String name, Long userId);
+
     Optional<TodoList> findTodoListById(Long id);
 
     Boolean existsByName(String name);

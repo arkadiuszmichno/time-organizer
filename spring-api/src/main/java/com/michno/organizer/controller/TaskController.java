@@ -1,9 +1,7 @@
 package com.michno.organizer.controller;
 
 import com.michno.organizer.exception.IncorrectInputDataException;
-import com.michno.organizer.exception.ResourceNotFoundException;
 import com.michno.organizer.model.Task;
-import com.michno.organizer.payload.ApiResponse;
 import com.michno.organizer.payload.TaskRequest;
 import com.michno.organizer.payload.TaskResponse;
 import com.michno.organizer.security.CurrentUser;
@@ -22,6 +20,7 @@ import javax.validation.Valid;
 import java.net.URI;
 
 @RestController
+@CrossOrigin("*")
 public class TaskController {
 
     @Autowired
@@ -55,21 +54,21 @@ public class TaskController {
         headers.setLocation(locationURI);
 
 
-        return ResponseEntity.created(locationURI).body(new ApiResponse(true, "Task created successfully"));
+        return ResponseEntity.created(locationURI).body(ModelMapper.mapTaskToTaskResponse(newTask));
     }
 
     @PutMapping(value = "/tasks/{id}")
     @PreAuthorize("hasRole('USER')")
-    public TaskResponse updateTask(@RequestBody @Valid TaskRequest taskRequest, Errors errors, @PathVariable Long taskId, @CurrentUser UserPrincipal currentUser) {
+    public TaskResponse updateTask(@PathVariable String id, @RequestBody @Valid TaskRequest taskRequest, Errors errors, @CurrentUser UserPrincipal currentUser) {
         if (errors.hasErrors()) throw new IncorrectInputDataException(errors);
 
-        Task task = taskService.updateTask(taskId, taskRequest, currentUser);
+        Task task = taskService.updateTask(Long.parseLong(id), taskRequest, currentUser);
         return ModelMapper.mapTaskToTaskResponse(task);
     }
 
     @DeleteMapping(value = "/tasks/{id}")
     @PreAuthorize("hasRole('USER')")
-    public void deleteTask(@PathVariable Long id, @CurrentUser UserPrincipal currentUser) {
-        taskService.deleteTask(id, currentUser);
+    public void deleteTask(@PathVariable String id, @CurrentUser UserPrincipal currentUser) {
+        taskService.deleteTask(Long.parseLong(id), currentUser);
     }
 }

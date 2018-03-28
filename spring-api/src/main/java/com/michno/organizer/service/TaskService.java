@@ -7,6 +7,7 @@ import com.michno.organizer.payload.TaskRequest;
 import com.michno.organizer.repository.TaskRepository;
 import com.michno.organizer.security.CurrentUser;
 import com.michno.organizer.security.UserPrincipal;
+import com.michno.organizer.util.InstantMapper;
 import com.michno.organizer.util.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,7 +47,7 @@ public class TaskService {
         task.setName(taskRequest.getName());
         task.setDescription(taskRequest.getDescription());
         task.setPriority(taskRequest.getPriority());
-        task.setEndDate(taskRequest.getEndDate());
+        task.setEndDate(InstantMapper.mapStringToInstant(taskRequest.getEndDate()));
 
         return taskRepository.save(task);
 

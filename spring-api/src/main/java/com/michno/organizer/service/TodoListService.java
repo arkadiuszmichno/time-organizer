@@ -57,15 +57,15 @@ public class TodoListService {
         return todoList;
     }
 
-    public boolean hasDuplicate(String name) {
-        Optional<TodoList> list = todoListRepository.findTodoListByName(name);
+    public boolean hasDuplicate(String name, Long userId) {
+        Optional<TodoList> list = todoListRepository.findTodoListByNameAndCreatedBy(name, userId);
         if (list.isPresent()) return true;
         else
             return false;
     }
 
-    public TodoList createTodoList(TodoListRequest list) {
-        if (hasDuplicate(list.getName()))
+    public TodoList createTodoList(TodoListRequest list, UserPrincipal currentUser) {
+        if (hasDuplicate(list.getName(), currentUser.getId()))
             throw new DuplicateToDoListException(list.getName());
 
         TodoList todoList = new TodoList();

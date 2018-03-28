@@ -16,7 +16,7 @@ public class TaskRequest {
 
     private String description;
 
-    private Instant endDate;
+    private String endDate;
 
     public String getName() {
         return name;
@@ -42,11 +42,11 @@ public class TaskRequest {
         this.description = description;
     }
 
-    public Instant getEndDate() {
+    public String getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Instant endDate) {
+    public void setEndDate(String endDate) {
         this.endDate = endDate;
     }
 }
