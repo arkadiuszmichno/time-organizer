@@ -1,42 +1,91 @@
-import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import {BrowserModule} from '@angular/platform-browser';
+import {NgModule} from '@angular/core';
 
-import { AppComponent } from './app.component';
-import { TaskListHeaderComponent } from './todo/tasks/task-list-header/task-list-header.component';
-import { TaskListComponent } from './todo/tasks/task-list/task-list.component';
-import { TaskListItemComponent } from './todo/tasks/task-list-item/task-list-item.component';
-import { TaskListFooterComponent } from './todo/tasks/task-list-footer/task-list-footer.component';
-import {TaskDataService} from "./todo/tasks/task-data.service";
-import { HttpClientModule } from '@angular/common/http';
-import {routerConfig} from "../router.config";
-import {RouterModule} from "@angular/router";
-import { HomeComponent } from './home/home.component';
-import { TodoComponent } from './todo/todo.component';
-import { TodoSideMenuComponent } from './todo/todo-side-menu/todo-side-menu.component';
-import { TodoListComponent } from './todo/todo-list/todo-list.component';
-import { TodoDataService } from './todo/todo-data.service';
 
+import {AppComponent} from './app.component';
+import {HeaderComponent} from './header/header.component';
+
+
+import {DropdownDirective} from './shared/dropdown.directive';
+
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {PomodoroComponent} from './pomodoro/pomodoro.component';
+import {AppRoutingModule} from './app-routing.module';
+
+import {SignupComponent} from './auth/signup/signup.component';
+import {SigninComponent} from './auth/signin/signin.component';
+import {AuthService} from './auth/auth.service';
+import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
+import {AuthInterceptor} from './shared/auth.interceptor';
+import {TokenStorage} from './shared/token.storage';
+import {HomeComponent} from './home/home.component';
+import {AuthGuardService} from './auth/auth-guard.service';
+import {DataSourceService} from './shared/data-source.service';
+import {TodosComponent} from './todos/todos.component';
+import {TodoListComponent} from './todos/todo-list/todo-list.component';
+import {TasksComponent} from './todos/tasks/tasks.component';
+import {TaskListComponent} from './todos/tasks/task-list/task-list.component';
+import {TaskDetailComponent} from './todos/tasks/task-detail/task-detail.component';
+import {TaskItemComponent} from './todos/tasks/task-list/task-item/task-item.component';
+import {TaskAddComponent} from './todos/tasks/task-list/task-add/task-add.component';
+import {TaskStartComponent} from './todos/tasks/task-start/task-start.component';
+import {TaskEditComponent} from './todos/tasks/task-edit/task-edit.component';
+import {TaskService} from './todos/tasks/task.service';
+import {TodoService} from './todos/todo.service';
+import {TodoItemComponent} from './todos/todo-list/todo-item/todo-item.component';
+import {MatCardModule} from '@angular/material/card';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {MatButtonModule} from '@angular/material/button';
+import {MatDividerModule, MatFormFieldModule, MatNativeDateModule} from '@angular/material';
+import { MatDatepickerModule } from '@angular/material';
+import {DlDateTimePickerDateModule, DlDateTimePickerModule} from 'angular-bootstrap-datetimepicker';
+import {CommonModule} from '@angular/common';
 
 @NgModule({
   declarations: [
     AppComponent,
-    TaskListHeaderComponent,
+    HeaderComponent,
+    TasksComponent,
     TaskListComponent,
-    TaskListItemComponent,
-    TaskListFooterComponent,
+    TaskItemComponent,
+    TaskDetailComponent,
+    TaskAddComponent,
+    DropdownDirective,
+    PomodoroComponent,
+    TaskStartComponent,
+    TaskEditComponent,
+    SignupComponent,
+    SigninComponent,
     HomeComponent,
-    TodoComponent,
-    TodoSideMenuComponent,
-    TodoListComponent
+    TodosComponent,
+    TodoListComponent,
+    TodoItemComponent
   ],
   imports: [
     BrowserModule,
     FormsModule,
+    ReactiveFormsModule,
+    AppRoutingModule,
     HttpClientModule,
-    RouterModule.forRoot(routerConfig)
+    MatCardModule,
+    BrowserAnimationsModule,
+    MatButtonModule,
+    MatDividerModule,
+    MatDatepickerModule,
+    MatFormFieldModule,
+    MatNativeDateModule,
+    DlDateTimePickerDateModule,
+    CommonModule
   ],
-  providers: [TaskDataService, TodoDataService],
+  providers: [
+    TaskService,
+    AuthService,
+    TokenStorage,
+    AuthGuardService,
+    DataSourceService,
+    TodoService,
+    {provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true}],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+}

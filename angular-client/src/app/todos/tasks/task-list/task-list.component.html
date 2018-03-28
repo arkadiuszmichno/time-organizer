@@ -1,0 +1,16 @@
+<div class="row">
+  <div class="col-xs-12">
+    <app-task-add></app-task-add>
+  </div>
+</div>
+<hr>
+<div class="row">
+  <div class="col-xs-14">
+    <app-task-item
+      *ngFor="let task of tasks"
+      [itemTask]="task"
+      [index]="task.id"
+      ></app-task-item>
+  </div>
+</div>
+

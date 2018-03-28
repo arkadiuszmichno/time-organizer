@@ -1,0 +1,56 @@
+<div class="row">
+  <div class="col-xs-12">
+    <form [formGroup]="taskForm" (ngSubmit)="onSubmit()">
+      <div class="row">
+        <div class="col-xs-12">
+          <button type="submit"
+                  class="btn btn-success"
+                  [disabled]="!taskForm.valid">Save
+          </button>
+          <button type="button" class="btn btn-danger" (click)="onCancel()">Cancel</button>
+        </div>
+      </div>
+      <div class="row" style="margin-top: 10px;">
+        <div class="col-xs-12">
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input
+              type="text"
+              id="name"
+              formControlName="name"
+              class="form-control">
+          </div>
+          <span class="help-block" *ngIf="!taskForm.get('name').valid && taskForm.get('name').touched">Name length should be minimum 3</span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-6">
+          <div class="form-group">
+            <label class="control-label" for="date">Date</label>
+            <input class="form-control" id="date" placeholder="MM/DD/YYY" type="text" formControlName="date"
+                   [min]="minDate" [matDatepicker]="picker"/>
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </div>
+
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12">
+          <div class="form-group">
+            <label for="description">Description</label>
+            <textarea
+              type="text"
+              id="description"
+              formControlName="description"
+              class="form-control"
+              rows="5"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+      </div>
+    </form>
+  </div>
+</div>

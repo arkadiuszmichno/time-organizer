@@ -1,6 +1,6 @@
 import { AppPage } from './app.po';
 
-describe('time-organizer-client App', () => {
+describe('time-organizer App', () => {
   let page: AppPage;
 
   beforeEach(() => {

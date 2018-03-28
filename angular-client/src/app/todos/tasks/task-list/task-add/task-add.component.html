@@ -1,0 +1,25 @@
+<div class="row">
+  <form (ngSubmit)="onAddItem(f)" #f="ngForm">
+    <div class="col-sm-8">
+      <input
+        type="text"
+        id="name"
+        name="name"
+        ngModel
+        class="form-control"
+        required
+        minlength="3"
+        #name="ngModel">
+      <span class="help-block" *ngIf="!name.valid && name.touched">Name length should be minimum 3</span>
+    </div>
+
+    <div class="col-md-offset-8">
+      <button class="btn btn-success" type="submit" [disabled]="!f.valid">New Task</button>
+    </div>
+  </form>
+</div>
+<div class="row" style="margin-top: 10px" >
+  <div class="col-sm-offset-8">
+    <button class="btn btn-danger" (click)="onAdvancedAdd()">Advanced</button>
+  </div>
+</div>

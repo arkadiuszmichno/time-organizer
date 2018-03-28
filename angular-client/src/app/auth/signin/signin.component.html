@@ -1,0 +1,29 @@
+<div class="row">
+  <div class="col-xs-12 col-sm-10 col-md-8 col-sm-offset-1 col-md-offset-2">
+    <form (ngSubmit)="onSignin(f)" #f="ngForm">
+      <div class="form-group">
+        <label for="usernameOrEmail">Username or Email</label>
+        <input type="text" id="usernameOrEmail" name="usernameOrEmail" ngModel class="form-control"
+               required
+               minlength="3"
+               maxlength="15"
+               #username="ngModel">
+      </div>
+      <span class="help-block" *ngIf="!username.valid && username.touched">Username length should be 3-15</span>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" ngModel class="form-control"
+               required
+               minlength="6"
+               maxlength="20"
+               #password="ngModel">
+      </div>
+      <span class="help-block" *ngIf="!password.valid && password.touched">Password length should be 6-20</span>
+
+      <span class="help-block" *ngIf="errorOccured">You entered wrong username or password!</span>
+
+      <button class="btn btn-primary" type="submit" [disabled]="!f.valid">Login</button>
+    </form>
+  </div>
+</div>

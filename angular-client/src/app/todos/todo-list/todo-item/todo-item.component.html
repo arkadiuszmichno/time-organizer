@@ -1,0 +1,6 @@
+<a button style="cursor: pointer;"
+   [routerLink]="[todoId] + '/tasks'"
+   routerLinkActive="active"
+   class="list-group-item">
+  {{ itemTodo.name }} <span class="badge">{{ itemTodo.tasks.length}}</span>
+</a>

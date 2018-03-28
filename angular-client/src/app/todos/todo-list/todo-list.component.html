@@ -1,0 +1,7 @@
+<section class="main" *ngIf="todos.length > 0">
+  <app-todo-item
+    *ngFor="let todo of todos"
+    [itemTodo] = "todo"
+    [todoId] = "todo.id">
+  </app-todo-item>
+</section>

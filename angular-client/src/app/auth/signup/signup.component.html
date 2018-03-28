@@ -1,0 +1,51 @@
+<div class="row">
+  <div class="col-xs-12 col-sm-10 col-md-8 col-sm-offset-1 col-md-offset-2">
+    <form (ngSubmit)="onSignup(f)" #f="ngForm">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" ngModel class="form-control"
+               required
+               minlength="3"
+               maxlength="15"
+               #username="ngModel">
+      </div>
+      <span class="help-block" *ngIf="usernameInUse">Username Is already in use!</span>
+      <span class="help-block" *ngIf="!username.valid && username.touched">Username length should be 3-15</span>
+
+      <div class="form-group">
+        <label for="name">Full Name</label>
+        <input type="text" id="name" name="name" ngModel class="form-control"
+               required
+               minlength="4"
+               maxlength="40"
+               #name="ngModel">
+      </div>
+      <span class="help-block" *ngIf="!name.valid && name.touched">Name length should be 4-40.</span>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" ngModel class="form-control"
+               required
+               email
+               maxlength="40"
+               #email="ngModel">
+      </div>
+      <span class="help-block" *ngIf="emailInUse">Email Is already in use!</span>
+      <span class="help-block" *ngIf="!email.valid && email.touched">Email is invalid</span>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" ngModel class="form-control"
+               required
+               minlength="6"
+               maxlength="20"
+               #password="ngModel">
+      </div>
+      <span class="help-block" *ngIf="!password.valid && password.touched">Password length should be 6-20</span>
+
+      <button class="btn btn-primary" type="submit" [disabled]="!f.valid">Register</button>
+    </form>
+  </div>
+</div>
+
+

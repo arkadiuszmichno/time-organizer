@@ -1,0 +1,17 @@
+<mat-card class="example-card">
+  <h3 *ngIf="task">{{ task.name }}</h3>
+  <hr>
+  <mat-card-content>
+    <label *ngIf="task" class="control-label">Description:</label>
+    <p *ngIf="task"> {{ task.description }}</p>
+    <hr>
+    <label class="control-label">End Date:</label>
+    <p *ngIf="task"> {{task.endDate | date}}</p>
+  </mat-card-content>
+
+  <mat-card-actions>
+    <button mat-button (click)="onEditTask()">Edit</button>
+    <button mat-button (click)="onDeleteTask()">Delete</button>
+  </mat-card-actions>
+</mat-card>
+
