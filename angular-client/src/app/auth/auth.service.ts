@@ -13,7 +13,8 @@ export class AuthService {
 
 
   signupUser(username: string, name: string, email: string, password: string) {
-    return this.httpClient.post(this.baseURL + '/signup', {username, name, email, password});
+    return this.httpClient.post(this.baseURL + '/signup', {username, name, email, password},
+      {headers: {'apphost': 'http://localhost:4200/registrationCompleted'}});
   }
 
   signIn(usernameOrEmail: string, password: string) {
@@ -28,5 +29,11 @@ export class AuthService {
     const auth = this.token.getToken() !== null;
     this.authenticatedUpdated.next(auth);
     return auth;
+  }
+
+  sendVerificationToken(verificationToken: string) {
+    this.httpClient.post(this.baseURL + '/registrationConfirm', {token: verificationToken}).subscribe(
+      response => console.log(response)
+    );
   }
 }

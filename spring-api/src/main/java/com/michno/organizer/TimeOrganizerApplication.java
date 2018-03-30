@@ -9,29 +9,28 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.annotation.PostConstruct;
-import java.sql.Time;
 import java.util.TimeZone;
 
 
 @SpringBootApplication
 @EnableJpaRepositories
 @EntityScan(basePackageClasses = {
-		TimeOrganizerApplication.class,
-		Jsr310JpaConverters.class
+        TimeOrganizerApplication.class,
+        Jsr310JpaConverters.class
 })
 public class TimeOrganizerApplication {
 
-	@Bean
-	public BCryptPasswordEncoder bCryptPasswordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+    @Bean
+    public BCryptPasswordEncoder bCryptPasswordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
-	@PostConstruct
-	void init() {
-		TimeZone.setDefault(TimeZone.getTimeZone("UT"));
-	}
+    @PostConstruct
+    void init() {
+        TimeZone.setDefault(TimeZone.getTimeZone("UT"));
+    }
 
-	public static void main(String[] args) {
-		SpringApplication.run(TimeOrganizerApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(TimeOrganizerApplication.class, args);
+    }
 }

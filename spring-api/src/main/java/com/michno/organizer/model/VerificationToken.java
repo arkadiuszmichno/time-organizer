@@ -15,8 +15,8 @@ public class VerificationToken {
 
     private String token;
 
-    @OneToOne
-    @JoinColumn(nullable = false, name = "id")
+    @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)
+    @JoinColumn(nullable = false, name = "user_id", foreignKey = @ForeignKey(name = "FK_VERIFY_USER"))
     private User user;
 
     private Date expiryDate;
@@ -29,9 +29,22 @@ public class VerificationToken {
     }
 
     public VerificationToken() {
+        super();
     }
 
-    public VerificationToken(String token, User user, Date expiryDate) {
+    public VerificationToken(String token) {
+        super();
+        this.token = token;
+        this.expiryDate = calculateExpiryDate(EXPIRATION);
+    }
+
+    public VerificationToken(final String token, User user) {
+        this.token = token;
+        this.user = user;
+        this.expiryDate = calculateExpiryDate(EXPIRATION);
+    }
+
+    public VerificationToken(final String token, User user, Date expiryDate) {
         this.token = token;
         this.user = user;
         this.expiryDate = expiryDate;

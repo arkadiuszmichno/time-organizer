@@ -1,105 +1,82 @@
 package com.michno.organizer.controller;
 
-import com.michno.organizer.exception.AppException;
-import com.michno.organizer.model.Role;
-import com.michno.organizer.model.RoleName;
-import com.michno.organizer.model.TodoList;
 import com.michno.organizer.model.User;
-import com.michno.organizer.payload.ApiResponse;
-import com.michno.organizer.payload.JwtAuthenticationResponse;
-import com.michno.organizer.payload.LoginRequest;
-import com.michno.organizer.payload.SignUpRequest;
-import com.michno.organizer.repository.RoleRepository;
-import com.michno.organizer.repository.TodoListRepository;
+import com.michno.organizer.payload.*;
 import com.michno.organizer.repository.UserRepository;
-import com.michno.organizer.security.JwtTokenProvider;
+import com.michno.organizer.service.AuthService;
+import com.michno.organizer.util.registration.OnRegistrationCompleteEvent;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.Collections;
 
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
 
     @Autowired
-    AuthenticationManager authenticationManager;
-
-    @Autowired
     UserRepository userRepository;
 
     @Autowired
-    RoleRepository roleRepository;
+    AuthService authService;
 
     @Autowired
-    PasswordEncoder passwordEncoder;
+    ApplicationEventPublisher eventPublisher;
 
-    @Autowired
-    JwtTokenProvider tokenProvider;
-
-    @Autowired
-    TodoListRepository todoListRepository;
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.getUsernameOrEmail(),
-                        loginRequest.getPassword()
-                )
-        );
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        String jwt = tokenProvider.generateToken(authentication);
+        String jwt = authService.authenticateUser(loginRequest);
 
         return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest, HttpServletRequest httpServletRequest) {
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-            return new ResponseEntity(new ApiResponse(false, "Username is already in use!"), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity(new ApiResponse(false, "Username is already in use!"),
+                    HttpStatus.BAD_REQUEST);
         }
 
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-            return new ResponseEntity(new ApiResponse(false, "Email is already in use!"), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity(new ApiResponse(false, "Email is already in use!"),
+                    HttpStatus.BAD_REQUEST);
         }
+        User user = new User(signUpRequest.getName(), signUpRequest.getUsername(),
+                signUpRequest.getEmail(), signUpRequest.getPassword());
 
-        User user = new User(signUpRequest.getName(), signUpRequest.getUsername(), signUpRequest.getEmail(), signUpRequest.getPassword());
+        User resultUser = authService.createUser(user);
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-
-        Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
-                .orElseThrow(() -> new AppException("User Role not set."));
-
-        user.setRoles(Collections.singleton(userRole));
-
-        User result = userRepository.save(user);
-
-
-        TodoList todayList = new TodoList("Today");
-        todayList.setCreatedBy(result.getId());
-        todoListRepository.save(todayList);
+        try {
+            String host = httpServletRequest.getHeader("apphost");
+            eventPublisher.publishEvent(new OnRegistrationCompleteEvent(resultUser, host));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentContextPath().path("/users/{username}")
-                .buildAndExpand(result.getUsername()).toUri();
+                .buildAndExpand(resultUser.getUsername()).toUri();
 
         return ResponseEntity.created(location).body(new ApiResponse(true, "User registered successfully"));
     }
 
+    @PostMapping("/registrationConfirm")
+    public ApiResponse confirmEmail(@RequestBody VerificationTokenRequest tokenRequest) {
+        String token = tokenRequest.getToken();
+
+        authService.confirmEmail(token);
+
+        return new ApiResponse(true, "User confirmed");
+    }
 }

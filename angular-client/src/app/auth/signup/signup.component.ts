@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {NgForm} from '@angular/forms';
 import {AuthService} from '../auth.service';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-signup',
@@ -11,7 +12,8 @@ export class SignupComponent implements OnInit {
   usernameInUse = false;
   emailInUse = false;
 
-  constructor(private authService: AuthService) {
+  constructor(private authService: AuthService,
+              private router: Router) {
   }
 
   ngOnInit() {
@@ -24,7 +26,8 @@ export class SignupComponent implements OnInit {
     const password = form.value['password'];
     this.authService.signupUser(username, name, email, password).subscribe(
       (response) => {
-        console.log(response)
+        console.log(response);
+        this.router.navigate(['/confirm']);
       },
       (error) => {
         if (error.error.message === 'Username is already in use!') {

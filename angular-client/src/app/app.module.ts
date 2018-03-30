@@ -40,6 +40,8 @@ import {MatDividerModule, MatFormFieldModule, MatNativeDateModule} from '@angula
 import { MatDatepickerModule } from '@angular/material';
 import {DlDateTimePickerDateModule, DlDateTimePickerModule} from 'angular-bootstrap-datetimepicker';
 import {CommonModule} from '@angular/common';
+import { ConfirmComponent } from './auth/confirm/confirm.component';
+import { RegistrationCompletedComponent } from './auth/registration-completed/registration-completed.component';
 
 @NgModule({
   declarations: [
@@ -59,7 +61,9 @@ import {CommonModule} from '@angular/common';
     HomeComponent,
     TodosComponent,
     TodoListComponent,
-    TodoItemComponent
+    TodoItemComponent,
+    ConfirmComponent,
+    RegistrationCompletedComponent
   ],
   imports: [
     BrowserModule,

@@ -17,6 +17,7 @@ public class UserPrincipal implements UserDetails {
     private Long id;
     private String name;
     private String username;
+    private boolean isEnabled;
 
     @JsonIgnore
     private String email;
@@ -26,12 +27,13 @@ public class UserPrincipal implements UserDetails {
 
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserPrincipal(Long id, String name, String username, String email, String password, Collection<? extends GrantedAuthority> authorities) {
+    public UserPrincipal(Long id, String name, String username, String email, String password, boolean isEnabled, Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.name = name;
         this.username = username;
         this.email = email;
         this.password = password;
+        this.isEnabled = isEnabled;
         this.authorities = authorities;
     }
 
@@ -46,6 +48,7 @@ public class UserPrincipal implements UserDetails {
                 user.getUsername(),
                 user.getEmail(),
                 user.getPassword(),
+                user.isEnabled(),
                 authorities);
     }
 
@@ -93,7 +96,7 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return isEnabled;
     }
 
     @Override
