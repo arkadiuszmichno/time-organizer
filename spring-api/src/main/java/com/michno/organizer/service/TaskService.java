@@ -12,6 +12,9 @@ import com.michno.organizer.util.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+
 @Service
 public class TaskService {
 
@@ -36,6 +39,12 @@ public class TaskService {
 
         Task task = ModelMapper.mapTaskRequestToTask(taskRequest);
         list.addTask(task);
+        if (list.getName() == "Today") {
+            task.setEndDate(Instant.now().truncatedTo(ChronoUnit.DAYS));
+        } else if (task.getEndDate() != null && task.getEndDate().isBefore(Instant.now().truncatedTo(ChronoUnit.DAYS))) {
+            TodoList todayList = todoListService.findByName("Today");
+            todayList.addTask(task);
+        }
 
         return taskRepository.save(task);
     }

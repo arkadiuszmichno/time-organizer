@@ -13,6 +13,7 @@ import com.michno.organizer.security.UserPrincipal;
 import com.michno.organizer.util.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,14 +77,34 @@ public class TodoListService {
 
     public TodoList updateTodoList(TodoListRequest list, Long id) {
         TodoList todoList = todoListRepository.findTodoListById(id).orElseThrow(() -> new ResourceNotFoundException("To-do List", "id", id));
-        todoList.setName(list.getName());
+        if (todoList.getName() != "Today")
+            todoList.setName(list.getName());
 
         return todoListRepository.save(todoList);
 
     }
 
     public void delete(Long id, UserPrincipal currentUser) {
-        findByIdAndUser(id, currentUser);
-        todoListRepository.delete(id);
+        TodoList list = findByIdAndUser(id, currentUser);
+        if (list.getName() != "Today")
+            todoListRepository.delete(id);
+    }
+
+    public void createTodayList(User resultUser) {
+        TodoList list = new TodoList("Today");
+        todoListRepository.save(list);
+        list.setCreatedBy(resultUser.getId());
+        list.setUpdatedBy(resultUser.getId());
+        todoListRepository.save(list);
+    }
+
+    @Transactional
+    public void deleteCreatedBy(Long id) {
+        todoListRepository.deleteAllByCreatedBy(id);
+    }
+
+    public TodoList findByName(String name) {
+        return todoListRepository.findTodoListByName(name).orElseThrow(
+                () -> new ResourceNotFoundException("to-do list", "name", name));
     }
 }

@@ -15,7 +15,7 @@ public class UserService implements IUserService {
     private UserRepository userRepository;
 
     @Autowired
-    private VerificationTokenRepository tokenRepository;
+    private TodoListService todoListService;
 
     @Override
     public User saveRegisteredUser(User user) {
@@ -40,6 +40,7 @@ public class UserService implements IUserService {
 
     @Override
     public void deleteUser(Long id) {
+        todoListService.deleteCreatedBy(id);
         userRepository.delete(id);
     }
 

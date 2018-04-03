@@ -47,4 +47,8 @@ export class DataSourceService {
   updateTodo(index: number, todo: Todo) {
     return this.httpClient.put<Todo>(BASE_URL + '/lists/' + index, todo);
   }
+
+  getTodoByName(s: string) {
+    return this.httpClient.get<Todo>(BASE_URL + '/lists/name/' + s);
+  }
 }

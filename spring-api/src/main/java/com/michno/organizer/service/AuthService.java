@@ -40,6 +40,9 @@ public class AuthService implements IAuthService {
     @Autowired
     private RoleRepository roleRepository;
 
+    @Autowired
+    private TodoListService todoListService;
+
     @Override
     public String authenticateUser(LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
@@ -80,7 +83,10 @@ public class AuthService implements IAuthService {
                 .orElseThrow(() -> new AppException("User Role not set."));
 
         user.setRoles(Collections.singleton(userRole));
+        User resultUser = userService.saveRegisteredUser(user);
 
-        return userService.saveRegisteredUser(user);
+        todoListService.createTodayList(resultUser);
+
+        return resultUser;
     }
 }

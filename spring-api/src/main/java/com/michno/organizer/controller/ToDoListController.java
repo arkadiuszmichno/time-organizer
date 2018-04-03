@@ -45,6 +45,13 @@ public class ToDoListController {
         return ModelMapper.mapTodoListToTodoListResponse(list);
     }
 
+    @GetMapping(value = "/name/{name}")
+    @PreAuthorize("hasRole('USER')")
+    public TodoListResponse getListByName(@CurrentUser UserPrincipal currentUser, @PathVariable("name") String name) {
+        TodoList list = todoListService.findByName(name);
+        return ModelMapper.mapTodoListToTodoListResponse(list);
+    }
+
     @GetMapping(value = "/{id}/tasks")
     @PreAuthorize("hasRole('USER')")
     public List<TaskResponse> getTasks(@PathVariable("id") Long id, @CurrentUser UserPrincipal currentUser) {

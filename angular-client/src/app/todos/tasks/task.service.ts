@@ -2,14 +2,18 @@ import {Task} from './task.model';
 import {Subject} from 'rxjs/Subject';
 import {Injectable} from '@angular/core';
 import {DataSourceService} from '../../shared/data-source.service';
+import {Todo} from '../todo.model';
 
 @Injectable()
 export class TaskService {
   tasksUpdated = new Subject<Task[]>();
   tasks: Task[] = [];
-  todoId = 23;
+  todoId: number;
 
   constructor(private dataSourceService: DataSourceService) {
+    this.dataSourceService.getTodoByName('Today').subscribe(
+      (todo: Todo) => this.todoId = todo.id
+    );
     this.getTasksFromServer();
   }
 
