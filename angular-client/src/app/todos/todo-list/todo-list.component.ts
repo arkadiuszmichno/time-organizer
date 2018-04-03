@@ -1,6 +1,8 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Subscription} from 'rxjs/Subscription';
 import {TodoService} from '../todo.service';
+import {NgForm} from '@angular/forms';
+import {Todo} from '../todo.model';
 
 @Component({
   selector: 'app-todo-list',
@@ -17,7 +19,7 @@ export class TodoListComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.todos = this.todoService.getTodos();
     this.subscription = this.todoService.todosUpdated.subscribe(
-      (newTodos) => this.todos = newTodos
+      (newTodos: Todo[]) => this.todos = newTodos
     );
   }
 
@@ -25,4 +27,9 @@ export class TodoListComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
   }
 
+  OnAddList(form: NgForm) {
+    const listName = form.value['name'];
+    const newList = new Todo(listName);
+    this.todoService.addTodo(newList);
+  }
 }

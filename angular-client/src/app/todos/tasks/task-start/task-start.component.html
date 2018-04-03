@@ -1,1 +1,14 @@
-<H3>Please select task.</H3>
+<mat-card class="example-card">
+  <h3 *ngIf="todo">{{ todo.name }}</h3>
+  <hr>
+  <mat-card-content>
+    <H3>Please select Task.</H3>
+    <hr>
+  </mat-card-content>
+
+  <mat-card-actions>
+    <button mat-button (click)="onEditList()">Edit List</button>
+    <button mat-button (click)="onDeleteList()">Delete List</button>
+  </mat-card-actions>
+</mat-card>
+

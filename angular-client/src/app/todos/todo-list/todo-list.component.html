@@ -1,7 +1,25 @@
-<section class="main" *ngIf="todos.length > 0">
-  <app-todo-item
-    *ngFor="let todo of todos"
-    [itemTodo] = "todo"
-    [todoId] = "todo.id">
-  </app-todo-item>
+<section class="main">
+  <div class="row">
+    <div class="col-md-12">
+      <form (ngSubmit)="OnAddList(f)" #f="ngForm">
+        <input
+          class="form-control"
+          type="text"
+          id="name"
+          name="name"
+          ngModel
+          required
+          minlength="3"
+          placeholder="Add New List"
+        >
+      </form>
+    </div>
+  </div>
+  <div *ngIf="todos.length > 0">
+    <app-todo-item
+      *ngFor="let todo of todos"
+      [itemTodo]="todo"
+      [todoId]="todo.id">
+    </app-todo-item>
+  </div>
 </section>

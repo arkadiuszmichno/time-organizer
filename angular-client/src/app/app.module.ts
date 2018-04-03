@@ -36,12 +36,12 @@ import {TodoItemComponent} from './todos/todo-list/todo-item/todo-item.component
 import {MatCardModule} from '@angular/material/card';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MatButtonModule} from '@angular/material/button';
-import {MatDividerModule, MatFormFieldModule, MatNativeDateModule} from '@angular/material';
-import { MatDatepickerModule } from '@angular/material';
-import {DlDateTimePickerDateModule, DlDateTimePickerModule} from 'angular-bootstrap-datetimepicker';
+import {MatDatepickerModule, MatDividerModule, MatFormFieldModule, MatNativeDateModule} from '@angular/material';
+import {DlDateTimePickerDateModule} from 'angular-bootstrap-datetimepicker';
 import {CommonModule} from '@angular/common';
-import { ConfirmComponent } from './auth/confirm/confirm.component';
-import { RegistrationCompletedComponent } from './auth/registration-completed/registration-completed.component';
+import {ConfirmComponent} from './auth/confirm/confirm.component';
+import {RegistrationCompletedComponent} from './auth/registration-completed/registration-completed.component';
+import { TodoListEditComponent } from './todos/todo-list-edit/todo-list-edit.component';
 
 @NgModule({
   declarations: [
@@ -63,7 +63,8 @@ import { RegistrationCompletedComponent } from './auth/registration-completed/re
     TodoListComponent,
     TodoItemComponent,
     ConfirmComponent,
-    RegistrationCompletedComponent
+    RegistrationCompletedComponent,
+    TodoListEditComponent,
   ],
   imports: [
     BrowserModule,

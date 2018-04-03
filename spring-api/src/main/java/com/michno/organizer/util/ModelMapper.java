@@ -7,6 +7,7 @@ import com.michno.organizer.payload.TaskRequest;
 import com.michno.organizer.payload.TaskResponse;
 import com.michno.organizer.payload.TodoListResponse;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,20 +17,21 @@ public class ModelMapper {
         todoListResponse.setId(todoList.getId());
         todoListResponse.setName(todoList.getName());
 
-        List<TaskResponse> taskResponses = todoList.getTasks().stream().map(task -> {
-            TaskResponse taskResponse = new TaskResponse();
-            taskResponse.setId(task.getId());
-            taskResponse.setName(task.getName());
-            taskResponse.setPriority(task.getPriority());
-            taskResponse.setDescription(task.getDescription());
-            taskResponse.setCreationDateTime(task.getCreatedAt());
-            taskResponse.setEndDate(InstantMapper.mapInstantToString(task.getEndDate()));
-            taskResponse.setReached(false);
-            return taskResponse;
-        }).collect(Collectors.toList());
+        if(todoList.getTasks() != null) {
+            List<TaskResponse> taskResponses = todoList.getTasks().stream().map(task -> {
+                TaskResponse taskResponse = new TaskResponse();
+                taskResponse.setId(task.getId());
+                taskResponse.setName(task.getName());
+                taskResponse.setPriority(task.getPriority());
+                taskResponse.setDescription(task.getDescription());
+                taskResponse.setCreationDateTime(task.getCreatedAt());
+                taskResponse.setEndDate(InstantMapper.mapInstantToString(task.getEndDate()));
+                taskResponse.setReached(false);
+                return taskResponse;
+            }).collect(Collectors.toList());
 
-        todoListResponse.setTasks(taskResponses);
-
+            todoListResponse.setTasks(taskResponses);
+        } else todoListResponse.setTasks(new ArrayList<>());
         return todoListResponse;
     }
 

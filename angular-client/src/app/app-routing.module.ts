@@ -14,11 +14,13 @@ import {TaskEditComponent} from './todos/tasks/task-edit/task-edit.component';
 import {TaskDetailComponent} from './todos/tasks/task-detail/task-detail.component';
 import {ConfirmComponent} from './auth/confirm/confirm.component';
 import {RegistrationCompletedComponent} from './auth/registration-completed/registration-completed.component';
+import {TodoListEditComponent} from './todos/todo-list-edit/todo-list-edit.component';
 
 const appRoutes: Routes = [
   {path: '', component: HomeComponent, pathMatch: 'full'},
   {
     path: 'todos', component: TodosComponent, children: [
+      {path: ':listId/edit', component: TodoListEditComponent},
       {
         path: ':listId/tasks', component: TasksComponent, children: [
           {path: '', component: TaskStartComponent},

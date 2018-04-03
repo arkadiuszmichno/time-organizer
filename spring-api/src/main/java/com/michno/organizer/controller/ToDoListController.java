@@ -68,7 +68,7 @@ public class ToDoListController {
                 .build()
                 .toUri();
 
-        return ResponseEntity.created(locationUri).body(new ApiResponse(true, "TodoList Created Successfully"));
+        return ResponseEntity.created(locationUri).body(ModelMapper.mapTodoListToTodoListResponse(todoResult));
     }
 
     @PutMapping(value = "/{id}")

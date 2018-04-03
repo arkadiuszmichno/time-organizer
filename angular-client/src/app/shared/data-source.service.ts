@@ -36,4 +36,15 @@ export class DataSourceService {
     return this.httpClient.get<Todo[]>(BASE_URL + '/lists');
   }
 
+  addTodo(todo: Todo) {
+    return this.httpClient.post<Todo>(BASE_URL + '/lists', todo);
+  }
+
+  deleteTodo(todoId: number) {
+    return this.httpClient.delete<Task>(BASE_URL + '/lists/' + todoId);
+  }
+
+  updateTodo(index: number, todo: Todo) {
+    return this.httpClient.put<Todo>(BASE_URL + '/lists/' + index, todo);
+  }
 }

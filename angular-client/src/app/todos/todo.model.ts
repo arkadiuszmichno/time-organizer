@@ -6,7 +6,9 @@ export class Todo {
   public tasks: Task[];
 
 
-  constructor(name: string) {
+  constructor(name: string, id?: number, tasks?: Task[]) {
     this.name = name;
+    this.id = id;
+    this.tasks = tasks;
   }
 }
