@@ -1,5 +1,5 @@
 # time-organizer
-Time-organizer is full-stack web application. It allows user create to-do lists to manage his time.
+Time-organizer is full-stack web application. It allows user to create to-do lists to manage his time.
 
 ## Technologies
 * Java 8
