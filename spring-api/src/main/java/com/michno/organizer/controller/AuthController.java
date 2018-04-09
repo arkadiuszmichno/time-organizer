@@ -27,7 +27,7 @@ public class AuthController {
     UserRepository userRepository;
 
     @Autowired
-    AuthService authService;
+    private AuthService authService;
 
     @Autowired
     ApplicationEventPublisher eventPublisher;
