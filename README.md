@@ -4,7 +4,7 @@ Time-organizer is full-stack web application. It allows user to create to-do lis
 ## Technologies
 * Java 8
 * Spring 4
-* Angular 2.5
+* Angular 5
 
 ## Features
 * Allows to create new account after email confirmation
